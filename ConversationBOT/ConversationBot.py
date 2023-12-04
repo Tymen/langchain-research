@@ -9,7 +9,7 @@ from langchain.schema.runnable import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.prompts import PromptTemplate
 from langchain.vectorstores import Chroma
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = "sk"
 
 llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo-1106")
 

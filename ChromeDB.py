@@ -14,7 +14,7 @@ from pprint import pprint
 import getpass
 import os
 
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = "sk"
 
 # import dotenv
 

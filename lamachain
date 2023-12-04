@@ -21,7 +21,7 @@ from llama_index.embedings import LangchainEmbedding
 from llama_index.node_parser import SimpleNodeParser
 from llama_index.text_splitter import TokenTextSplitter
 from llama_index.response.notebook_utils import display_response
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = "sk"
 def create_service_context(
   # Constraint parameters
   max_input_size = 4096,        # Context window for the LLM.

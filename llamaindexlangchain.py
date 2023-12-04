@@ -1,6 +1,6 @@
 import os
 
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = "sk"
 
 from llama_index import SimpleDirectoryReader, GPTSimpleVectorIndex, LLMPredictor, ServiceContext, PromptHelper
 from langchain.chat_models import ChatOpenAI
