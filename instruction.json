@@ -1,0 +1,167 @@
+[{
+    "subject": "kafka",
+    "version": 1,
+    "last_modified": "2019-01-01T00:00:00Z",
+    "description": "This contains an instruction on how to develop a kafka connector",
+    "tags": [
+        "kafka",
+        "connector",
+        "development",
+        "code examples"
+    ],
+    "author": "John Doe",
+    "content": "This is the content of the article",
+    "code-example": {
+        "language": "java",
+        "content": "public class Test { public static void main(String[] args) { System.out.println(\"Hello World\"); } }"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 1,
+    "last_modified": "2023-01-01T00:00:00Z",
+    "description": "A comprehensive guide for setting up Apache Kafka in a production environment.",
+    "tags": [
+        "kafka",
+        "setup",
+        "installation",
+        "production"
+    ],
+    "author": "Jane Smith",
+    "content": "This guide covers the steps required to set up Apache Kafka...",
+    "code-example": {
+        "language": "bash",
+        "content": "wget http://apache.mirror.digitalpacific.com.au/kafka/2.7.0/kafka_2.13-2.7.0.tgz"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 1,
+    "last_modified": "2023-02-15T00:00:00Z",
+    "description": "Tutorial on implementing stream processing with Kafka Streams.",
+    "tags": [
+        "kafka",
+        "stream processing",
+        "kafka streams",
+        "tutorial"
+    ],
+    "author": "Michael Johnson",
+    "content": "This tutorial explains how to process streams of data using Kafka Streams...",
+    "code-example": {
+        "language": "java",
+        "content": "StreamsBuilder builder = new StreamsBuilder(); KStream<String, String> textLines = builder.stream(\"TextLinesTopic\");"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 1,
+    "last_modified": "2023-03-10T00:00:00Z",
+    "description": "Best practices for securing your Kafka clusters.",
+    "tags": [
+        "kafka",
+        "security",
+        "best practices",
+        "cluster"
+    ],
+    "author": "Alice Green",
+    "content": "Securing a Kafka cluster involves multiple steps including...",
+    "code-example": {
+        "language": "yaml",
+        "content": "listeners=SASL_PLAINTEXT://:9092\nsecurity.inter.broker.protocol=SASL_PLAINTEXT\nsasl.mechanism.inter.broker.protocol=SCRAM-SHA-256"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 1,
+    "last_modified": "2023-04-20T00:00:00Z",
+    "description": "Strategies and considerations for scaling a Kafka cluster.",
+    "tags": [
+        "kafka",
+        "scaling",
+        "cluster management",
+        "performance"
+    ],
+    "author": "Robert Brown",
+    "content": "When scaling a Kafka cluster, one must consider factors such as...",
+    "code-example": {
+        "language": "json",
+        "content": "{\"num.partitions\": \"10\", \"default.replication.factor\": \"3\", \"min.insync.replicas\": \"2\"}"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 2,
+    "last_modified": "2023-05-05T00:00:00Z",
+    "description": "In-depth guide on tuning and optimizing Apache Kafka for high throughput and low latency.",
+    "tags": [
+        "kafka",
+        "performance",
+        "optimization",
+        "throughput",
+        "latency"
+    ],
+    "author": "Elena Rodriguez",
+    "content": "Optimizing Kafka for better performance involves several layers including broker configuration, topic partitioning, and producer/consumer optimizations. This guide dives into advanced settings...",
+    "code-example": {
+        "language": "yaml",
+        "content": "message.max.bytes=1000012\nreplica.fetch.max.bytes=1048576\nfetch.message.max.bytes=1048576\nlog.segment.bytes=1073741824"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 2,
+    "last_modified": "2023-06-21T00:00:00Z",
+    "description": "Advanced concepts in Kafka Streams for complex event processing and stateful operations.",
+    "tags": [
+        "kafka",
+        "advanced",
+        "kafka streams",
+        "event processing",
+        "stateful"
+    ],
+    "author": "David Chen",
+    "content": "This article delves into complex event processing with Kafka Streams, covering stateful operations, windowing techniques, and custom state stores...",
+    "code-example": {
+        "language": "java",
+        "content": "KStream<Windowed<String>, Long> wordCounts = textLines.groupByKey().windowedBy(TimeWindows.of(Duration.ofMinutes(5))).count().toStream();"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 2,
+    "last_modified": "2023-07-30T00:00:00Z",
+    "description": "Expert-level guide on managing and monitoring Kafka clusters for maximum reliability and efficiency.",
+    "tags": [
+        "kafka",
+        "cluster management",
+        "monitoring",
+        "reliability",
+        "efficiency"
+    ],
+    "author": "Sophia Martinez",
+    "content": "Managing a Kafka cluster at scale requires advanced strategies in monitoring, rebalancing, and maintenance. This article explores best practices in cluster health monitoring and preventive maintenance...",
+    "code-example": {
+        "language": "bash",
+        "content": "kafka-topics.sh --describe --topic myTopic --bootstrap-server localhost:9092"
+    }
+},
+{
+    "subject": "kafka",
+    "version": 2,
+    "last_modified": "2023-07-30T00:00:00Z",
+    "description": "Expert-level guide on managing and monitoring Kafka clusters for maximum reliability and efficiency.",
+    "tags": [
+        "kafka",
+        "cluster management",
+        "monitoring",
+        "reliability",
+        "efficiency"
+    ],
+    "author": "Sophia Martinez",
+    "content": "Managing a Kafka cluster at scale is a challenging task that requires a deep understanding of Kafka's internal workings and a strategic approach to cluster design and operation. This article covers several key areas essential for effective Kafka cluster management",
+    "code-example": {
+        "language": "bash",
+        "content": "kafka-topics.sh --describe --topic myTopic --bootstrap-server localhost:9092"
+    }
+}
+]

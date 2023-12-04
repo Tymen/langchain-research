@@ -1,0 +1,94 @@
+import os
+import sys
+import gradio as gr
+
+from langchain.chat_models import ChatOpenAI
+from langchain.embeddings import OpenAIEmbeddings
+from langchain.chat_models import AzureChatOpenAI
+
+from llama_index import (
+    SimpleDirectoryReader,
+    LLMPredictor,
+    PromptHelper,
+    ServiceContext,
+    StorageContext,
+    GPTVectorStoreIndex,
+    load_index_from_storage,
+    set_global_service_context)
+
+from llama_index.embedings import LangchainEmbedding
+
+from llama_index.node_parser import SimpleNodeParser
+from llama_index.text_splitter import TokenTextSplitter
+from llama_index.response.notebook_utils import display_response
+os.environ['OPENAI_API_KEY'] = "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"
+def create_service_context(
+  # Constraint parameters
+  max_input_size = 4096,        # Context window for the LLM.
+  num_outputs = 256,            # Number of output tokens for the LLM.
+  chunk_overlap_ratio = 0.1,    # Chunk overlap as a ratio of chunk size.
+  chunk_size_limit = None,      # Maximum chunk size to use.
+  chunk_overlap = 20,           # Chunk overlap to use.
+  chunk_size = 1024,            # Set chunk overlap to use.
+  ):
+
+  # The parser that converts documents into nodes.
+  node_parser = SimpleNodeParser.from_defaults(
+      # The text splitter used to split text into chunks.
+      text_splitter=TokenTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+      )
+
+  # Allows the user to explicitly set certain constraint parameters.
+  prompt_helper = PromptHelper(
+      max_input_size,
+      num_outputs,
+      chunk_overlap_ratio,
+      chunk_size_limit=chunk_size_limit)
+
+  # LLMPredictor is a wrapper class around LangChain's LLMChain that allows easy integration into LlamaIndex.
+  llm_predictor = LLMPredictor(
+      llm=AzureChatOpenAI(
+          #temperature=0.5,
+          deployment_name="chatgpt_model",
+          max_tokens=num_outputs))
+
+  # The embedding model used to generate vector representations of text.
+  embedding_llm = LangchainEmbedding(
+      langchain_embeddings=OpenAIEmbeddings(
+          model ="text-embedding-ada-002",
+          chunk_size=1)
+      )
+
+  # Constructs service context
+  service_context = ServiceContext.from_defaults(
+      llm_predictor=llm_predictor,
+      embed_model=embedding_llm,
+      node_parser=node_parser,
+      prompt_helper=prompt_helper)
+
+  return service_context
+
+def data_ingestion_indexing(directory_path):
+
+  # Loads data from the specified directory path
+  documents = SimpleDirectoryReader(directory_path).load_data()
+
+  # When first building the index
+  index = GPTVectorStoreIndex.from_documents(
+      documents, service_context=create_service_context()
+  )
+
+  # Persist index to disk, default "storage" folder
+  index.storage_context.persist()
+
+  return index
+
+service_context = create_service_context()
+set_global_service_context(service_context)
+
+index = data_ingestion_indexing("data")
+
+query_engine = index.as_query_engine()
+
+response = query_engine.query("Hello who are you?")
+display_response(response)
