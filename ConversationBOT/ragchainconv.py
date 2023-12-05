@@ -14,8 +14,9 @@ from operator import itemgetter
 
 from langchain.memory import ConversationBufferMemory
 from typing import List, Tuple
+import datetime
 
-os.environ['OPENAI_API_KEY'] = "sk"
+os.environ['OPENAI_API_KEY'] = "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"
 
 with open('./mysqldb.txt') as f:
     mysqldbdocs = f.read()
@@ -34,7 +35,7 @@ vectorstore = Chroma.from_documents(documents=texts, embedding=OpenAIEmbeddings(
 
 retriever = vectorstore.as_retriever()
 
-_template = """Given the following conversation and a follow up question, in its original language.
+_template = """Given the following conversation and a follow up question, in the english language.
 
 Chat History:
 {chat_history}
@@ -42,7 +43,8 @@ Follow Up Input: {question}
 Standalone question:"""
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
-template = """Answer the question based only on the following context or Chat History:
+template = """Answer the question based only on the following context or Chat History. 
+If there is more context needed to answer the question or customize the answer ask a question about the needed information:
 {context}
 
 Question: {question}
@@ -54,6 +56,9 @@ DEFAULT_DOCUMENT_PROMPT = PromptTemplate.from_template(template="{page_content}"
 memory = ConversationBufferMemory(
     return_messages=True, output_key="answer", input_key="question"
 )
+
+chathistory = [
+]
 
 def _combine_documents(
     docs, document_prompt=DEFAULT_DOCUMENT_PROMPT, document_separator="\n\n"
@@ -71,20 +76,20 @@ def _format_chat_history(chat_history: List[Tuple]) -> str:
     return buffer
 
 loaded_memory = RunnablePassthrough.assign(
-    chat_history=RunnableLambda(memory.load_memory_variables) | itemgetter("history"),
+    chat_history=RunnableLambda(memory.load_memory_variables),
 )
 
 # Now we calculate the standalone question
-print(lambda x: _format_chat_history(x["chat_history"]))
 standalone_question = {
     "standalone_question": {
         "question": lambda x: x["question"],
-        "chat_history": lambda x: _format_chat_history(x["chat_history"]),
+        "chat_history": lambda x: _format_chat_history(x["history_chat"]),
     }
     | CONDENSE_QUESTION_PROMPT
     | ChatOpenAI(temperature=0.5, model="gpt-4")
     | StrOutputParser(),
 }
+
 # Now we retrieve the documents
 retrieved_documents = {
     "docs": itemgetter("standalone_question") | retriever,
@@ -105,6 +110,10 @@ final_chain = loaded_memory | standalone_question | retrieved_documents | answer
 
 while True:
     input_text = input("Human: ")
-    inputs = {"question": input_text}
+    now = datetime.datetime.now()
+    formatted_now = "DateTime: " + now.strftime("%Y-%m-%d %H:%M:%S") + " "
+    inputs = {"question": formatted_now + input_text, "history_chat": chathistory}
     result = final_chain.invoke(inputs)
-    print(result)
+    chathistory.append((formatted_now + input_text, formatted_now + result["answer"].content))
+    
+    print("Answer: " + result["answer"].content)
