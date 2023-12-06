@@ -15,10 +15,12 @@ from operator import itemgetter
 from langchain.memory import ConversationBufferMemory
 from typing import List, Tuple
 import datetime
+from dotenv import load_dotenv
+load_dotenv()
 
-os.environ['OPENAI_API_KEY'] = "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"
+os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_TOKEN')
 
-with open('./mysqldb.txt') as f:
+with open('./data/datacontext.txt') as f:
     mysqldbdocs = f.read()
 
 text_splitter = RecursiveCharacterTextSplitter(
@@ -36,15 +38,18 @@ vectorstore = Chroma.from_documents(documents=texts, embedding=OpenAIEmbeddings(
 retriever = vectorstore.as_retriever()
 
 _template = """Given the following conversation and a follow up question, in the english language.
-
 Chat History:
 {chat_history}
 Follow Up Input: {question}
-Standalone question:"""
+Question:"""
 CONDENSE_QUESTION_PROMPT = PromptTemplate.from_template(_template)
 
-template = """Answer the question based only on the following context or Chat History. 
-If there is more context needed to answer the question or customize the answer ask a question about the needed information:
+template = """If information is available in chat history make sure to use this. 
+If there is data that needs to be provided by the user please ask me for this information before answering my question. 
+You always end the answer with a follow up question either to ask for extra context or to ask if you can help about a specific topic that is related to the question.
+
+Answer the question only on the following context or Chat History.
+Context:
 {context}
 
 Question: {question}
