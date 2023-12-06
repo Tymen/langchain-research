@@ -1,16 +1,16 @@
 import os
-import datetime
+
 from dotenv import load_dotenv
 from langchain.agents.openai_assistant import OpenAIAssistantRunnable
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
 from typing import List, Tuple
-
+import gradio as gr
 # Load environment variables
 load_dotenv()
 os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_TOKEN')
-
+print("Initializing chat bot...")
 # Initialize Vector Database
 with open('./data/datacontext.txt') as f:
     mysqldbdocs = f.read()
@@ -57,12 +57,7 @@ def format_chat_history(chat_history: List[Tuple]) -> str:
         buffer += "\n" + "\n".join([human, ai])
     return buffer
 
-def process_input(input_text: str, chathistory: List[Tuple], thread_id: str) -> Tuple[str, str]:
-    now = datetime.datetime.now()
-    formatted_now = now.strftime("%Y-%m-%d %H:%M:%S")
-    formatted_input = f"DateTime: {formatted_now} {input_text}"
-    chathistory.append((formatted_input, ""))
-    chat_history_formatted = format_chat_history(chathistory)
+def process_input(input_text: str, thread_id: str) -> Tuple[str, str]:
 
     # Retrieve context from the vector database based on the user's input
     docs = retriever.invoke(input_text)
@@ -71,11 +66,10 @@ def process_input(input_text: str, chathistory: List[Tuple], thread_id: str) -> 
     retrieved_context = " ".join([doc.page_content for doc in docs]) if docs else ""
 
     # Combine the retrieved context with the chat history
-    combined_context = "\nContext: " + retrieved_context
-    print(combined_context)
+    combined_context = "\nContext: \n" + retrieved_context
     # Prepare input for the assistant with combined context
     assistant_input = {
-        "content": formatted_input, 
+        "content": input_text, 
         "context": combined_context
     }
     if thread_id:
@@ -93,12 +87,110 @@ def process_input(input_text: str, chathistory: List[Tuple], thread_id: str) -> 
     
     return response, thread_id
 
-print("Initializing chat bot...")
-print("Hello, I am ASkWatson, an assistant for interactive tasks. I am here to help you with your questions.")
+def chatbot(input_text, history, thread_id):
+    global chathistory
 
+    result, thread_id = process_input(input_text, thread_id)
+
+    # Update the history with new conversation entries
+    new_entry = [input_text, result]
+    history.append(new_entry)
+    return history, "", thread_id  # Clear input box after submission
+
+# Define the Gradio Interface using Blocks
+css = """
+#component-3 {
+    min-height: 60vh!important;
+}
+#component-5{
+    border: none!important;
+    border-bottom-right-radius: 0!important;
+    border-top-right-radius: 0!important;
+}
+
+#component-5 textarea {
+    border: none!important;
+    border-radius: 0!important;
+}
+
+#component-6 { 
+    max-width: 15%;
+    border-bottom-left-radius: 0!important;
+    border-top-left-radius: 0!important;
+    background-color: orange!important;
+}
+
+#component-4 {
+    gap: 0;
+}
+
+"""
+
+# Define the Gradio Interface using Blocks
+with gr.Blocks(css=css) as interface:
+    gr.Markdown("### ASkWatson Chatbot")
+    with gr.Row():
+        history_box = gr.Chatbot(label="Chat")
+    with gr.Row():
+        input_box = gr.Textbox(label=None, placeholder="Type your message here...", )
+        submit_btn = gr.Button("Send")
+        thread_id_state = gr.State(None)
+    input_box.submit(
+        fn=chatbot,
+        inputs=[input_box, history_box, thread_id_state],
+        outputs=[history_box, input_box, thread_id_state]
+    )
+    submit_btn.click(
+        fn=chatbot,
+        inputs=[input_box, history_box, thread_id_state],
+        outputs=[history_box, input_box, thread_id_state]
+    )
+
+launchedInterface = interface.launch(share=True)
+# def chatbot(input_text, thread_id):
+#     global chathistory
+
+#     result, thread_id = process_input(input_text, thread_id)
+    
+#     if chathistory:
+#         chathistory[-1] = [input_text, result]
+#     else:
+#         chathistory.append([input_text, result])
+
+#     return result, thread_id
+
+# # Initialize Gradio State for the thread ID
+# thread_id_state = gr.State(None)
+
+# # Define the Gradio Interface
+# iface = gr.Interface(
+#     fn=chatbot,
+#     inputs=[gr.Textbox(label="Your Message"), thread_id_state],
+#     outputs=[gr.Textbox(label="ASkWatson's Response"), thread_id_state],
+#     title="ASkWatson Chatbot",
+#     css="#component-3 {height: 60vh!important}"
+# )
+
+# iface.launch(share=True)
+
+# def chatbot(input_text, history):
+#     global thread_id  # Declare thread_id as a global variable
+
+#     # Rest of your code remains the same
+#     result, thread_id = process_input(input_text, thread_id)
+
+#     if chathistory:
+#         chathistory[-1] = [history[-1][0], result]
+#     else:
+#         chathistory.append([input_text, result])
+
+#     return result
+
+# gr.ChatInterface(chatbot, title="ASkWatson", css="#component-3 {height: 60vh!important}").launch(share=True)
 # Main interaction loop
-while True:
-    input_text = input("Human: ")
-    result, thread_id = process_input(input_text, chathistory, thread_id)
-    chathistory[-1] = (chathistory[-1][0], result)
-    print("Assistant: " + result)
+# while True:
+#     input_text = input("Human: ")
+#     result, thread_id = process_input(input_text, chathistory, thread_id)
+#     chathistory[-1] = [chathistory[-1][0], result]
+#     print(chathistory)
+#     print("Assistant: " + result)
