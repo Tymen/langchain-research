@@ -14,6 +14,6 @@ This project aims to explore the capabilities of AI-powered interactive assistan
 
 The primary goal of this project is to conduct research into the field of conversational AI and context-aware computing. By integrating a powerful language model with a custom-built vector database, this project seeks to investigate:
 
-- **The effectiveness of AI in understanding and responding to complex queries.
-- **The impact of context retrieval on the quality of conversational AI.
-- **The potential applications of AI-powered assistants in various domains.
+- The effectiveness of AI in understanding and responding to complex queries.
+- The impact of context retrieval on the quality of conversational AI.
+- The potential applications of AI-powered assistants in various domains.
