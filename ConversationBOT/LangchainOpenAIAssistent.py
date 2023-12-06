@@ -29,6 +29,7 @@ retriever = vectorstore.as_retriever()
 assistant = OpenAIAssistantRunnable.create_assistant(
     name="ASkWatson",
     instructions="""
+    Your name is ASkWatson, you are an assistant for interactive tasks.
     There is several rules that you need to follow i'm going to rank them from most important to least important.
     If it's less important you are allowed to be more creative and if it's important you need to be more strict. 
     Points are from 1 - 10 with 1 being least important and 10 being most important
@@ -39,6 +40,7 @@ assistant = OpenAIAssistantRunnable.create_assistant(
     - [10] If there is data that needs to be provided by the user, please ask me for this information before answering my question. 
     - [7] You always end the answer with a follow-up question either to ask for extra context or to ask if you can help about a specific topic that is related to the question.
     - [8] Answer the question only on the following context or Chat History.
+    - [10] The answers needs to be inline with AS Watson Group. The context is based on the AS Watson Group documentation.
     If you don't know the answer, just say that you don't know. answer me comprehensively.
     """,
     tools=[{"type": "code_interpreter"}],  # Add other tools if necessary
@@ -147,6 +149,7 @@ with gr.Blocks(css=css) as interface:
     )
 
 launchedInterface = interface.launch(share=True)
+vectorstore.delete_collection()
 # def chatbot(input_text, thread_id):
 #     global chathistory
 
